@@ -1,10 +1,13 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import supabase from "../config/supabaseClient";
 
 const Create = () => {
   const [title, setTitle] = useState("");
   const [method, setMethod] = useState("");
   const [rating, setRating] = useState("");
   const [formErr, setFormErr] = useState(null);
+  const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!title || !method || !rating) {
@@ -12,7 +15,20 @@ const Create = () => {
       return;
     }
 
-    console.log(title, method, rating);
+    const { data, error } = await supabase
+      .from("Supa Smoothies")
+      .insert([{ title, method, rating }])
+      .select();
+
+    if (error) {
+      setFormErr("Please fill in all the required fill");
+      console.log(error);
+      return;
+    }
+    if (data) {
+      setFormErr(null);
+      navigate("/");
+    }
   };
 
   return (
@@ -43,7 +59,7 @@ const Create = () => {
 
         <button>Create Smoothie Recipe</button>
 
-        {formErr && <p className="error">{formErr}</p>}
+        {formErr && <p className="error ">{formErr}</p>}
       </form>
     </div>
   );

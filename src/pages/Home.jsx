@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import SmoothiesCard from "../components/smoothiescard";
-import supabase from "../config/supabaseClient";
+import supabase from "../config/supabaseclient";
 
 const Home = () => {
   const [fetchErr, setFetchErr] = useState(null);
@@ -24,20 +24,26 @@ const Home = () => {
     fetchSmoothies();
   }, []);
 
-  return (
-    <div className="page home">
-      {fetchErr && <p>{fetchErr}</p>}
-      {smoothies && (
-        <div className="smoothies">
-          <div className="smoothie-grid">
-            {smoothies.map((smoothie) => (
-              <SmoothiesCard key={smoothie.id} smoothie={smoothie} />
-            ))}
-          </div>
+  let content = null;
+  if (fetchErr && !smoothies) {
+    content = <p>{fetchErr}</p>;
+  }
+  if (!fetchErr && !smoothies) {
+    content = <p>loading...</p>;
+  }
+  if (!fetchErr && smoothies) {
+    content = (
+      <div className="smoothies">
+        <div className="smoothie-grid">
+          {smoothies.reverse().map((smoothie) => (
+            <SmoothiesCard key={smoothie.id} smoothie={smoothie} />
+          ))}
         </div>
-      )}
-    </div>
-  );
+      </div>
+    );
+  }
+
+  return <div className="page home">{content}</div>;
 };
 
 export default Home;
